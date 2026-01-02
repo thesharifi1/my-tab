@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Tab</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;300;400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-deep: #020617;
+            --accent: #38bdf8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text);
+            font-family: 'Vazirmatn', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- پس‌زمینه پویا و متحرک (Dynamic Mesh Gradient) --- */
+        .background-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--bg-deep);
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.4;
+            animation: move 20s infinite alternate;
+        }
+
+        .blob-2 {
+            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 100%);
+            width: 600px;
+            height: 600px;
+            right: -10%;
+            top: -10%;
+            animation-duration: 25s;
+            animation-delay: -5s;
+        }
+
+        @keyframes move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 100px) scale(1.2); }
+        }
+
+        /* --- محفظه اصلی --- */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+            animation: fadeIn 1.2s ease-out;
+            z-index: 10;
+        }
+
+        /* --- نوار جستجوی پیشرفته --- */
+        .search-container {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .search-container:focus-within {
+            max-width: 700px; /* بزرگ شدن هنگام تایپ */
+            transform: translateY(-5px);
+        }
+
+        #search-form {
+            display: flex;
+            align-items: center;
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            padding: 10px 25px;
+            border-radius: 100px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transition: border-color 0.3s;
+        }
+
+        .search-container:focus-within #search-form {
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
+        }
+
+        #search-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-family: 'Vazirmatn';
+            font-size: 1.2rem;
+            width: 100%;
+            margin-right: 15px;
+        }
+
+        .search-icon {
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- شبکه میانبرها (Grid) --- */
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .link-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            opacity: 0;
+            animation: slideIn 0.8s ease forwards;
+        }
+
+        .link-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            background: rgba(255,255,255,0.08);
+            border-color: var(--accent);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+
+        .link-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+        }
+
+        .link-name { font-size: 0.9rem; font-weight: 300; }
+
+        /* --- دکمه تنظیمات --- */
+        .settings-trigger {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+
+        .settings-trigger:hover { transform: rotate(90deg); border-color: var(--accent); }
+
+        /* --- انیمیشن‌ها --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-canvas">
+        <div class="blob"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <main class="container">
+        <div class="search-container">
+            <form action="https://www.google.com/search" method="GET" id="search-form">
+                <div class="search-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+                <input type="text" name="q" id="search-input" placeholder="" autocomplete="off" autofocus>
+            </form>
+        </div>
+
+        <div class="links-grid" id="links-grid"></div>
+    </main>
+
+    <button class="settings-trigger" onclick="openSettings()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    </button>
+
+    <script>
+        const defaultLinks = [
+            { name: 'گوگل', url: 'https://google.com' },
+            { name: 'یوتیوب', url: 'https://youtube.com' },
+            { name: 'گیت‌هاب', url: 'https://github.com' },
+            { name: 'چت جی‌پی‌تی', url: 'https://chatgpt.com' },
+            { name: 'ورزش ۳', url: 'https://varzesh3.com' },
+            { name: 'دیجی‌کالا', url: 'https://digikala.com' },
+            { name: 'توییتر', url: 'https://x.com' },
+            { name: 'پینترست', url: 'https://pinterest.com' }
+        ];
+
+        function renderLinks() {
+            const saved = localStorage.getItem('myTabLinks');
+            const links = saved ? JSON.parse(saved) : defaultLinks;
+            const grid = document.getElementById('links-grid');
+            
+            grid.innerHTML = links.map((link, i) => `
+                <a href="${link.url}" class="link-card" style="animation-delay: ${i * 0.1}s">
+                    <img class="link-icon" src="https://www.google.com/s2/favicons?sz=64&domain=${link.url}">
+                    <span class="link-name">${link.name}</span>
+                </a>
+            `).join('');
+        }
+
+        function openSettings() {
+            const newUrl = prompt("آدرس جدید را وارد کنید (مثال: https://google.com):");
+            if (newUrl) {
+                const name = prompt("نام سایت:");
+                const saved = JSON.parse(localStorage.getItem('myTabLinks')) || defaultLinks;
+                saved.push({ name, url: newUrl });
+                localStorage.setItem('myTabLinks', JSON.stringify(saved.slice(-12))); // حداکثر ۱۲ تا
+                renderLinks();
+            }
+        }
+
+        window.onload = () => {
+            renderLinks();
+            document.getElementById('search-input').focus();
+        };
+    </script>
+</body>
+</html>
